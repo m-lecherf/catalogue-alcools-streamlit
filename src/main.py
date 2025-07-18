@@ -865,10 +865,10 @@ def main():
     st.sidebar.markdown("""
     <div style="padding: 1rem; text-align: center; margin-bottom: 2rem;">
         <div style="font-size: 3rem; margin-bottom: 0.5rem;">🍯</div>
-        <h2 style="color: var(--warm-white); font-family: 'Playfair Display', serif; margin: 0;">
+        <h2 style="color: #FFFFFF; font-family: 'Playfair Display', serif; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
             VinPedia
         </h2>
-        <p style="color: rgba(255,255,255,0.8); font-size: 1rem; margin: 0.5rem 0;">
+        <p style="color: #F0F0F0; font-size: 1rem; margin: 0.5rem 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.6);">
             Collection Artisanale
         </p>
     </div>
@@ -879,13 +879,13 @@ def main():
     user_title = "Maître Distillateur" if st.session_state.is_admin else "Collectionneur"
     
     st.sidebar.markdown(f"""
-    <div class="stat-card" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3);">
+    <div class="stat-card" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px);">
         <div style="text-align: center;">
             <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">{user_icon}</div>
-            <div style="color: var(--warm-white); font-weight: 600; font-size: 1rem;">
+            <div style="color: #FFFFFF; font-weight: 600; font-size: 1rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
                 {st.session_state.user_email}
             </div>
-            <div style="color: rgba(255,255,255,0.7); font-size: 1rem; margin-top: 0.3rem;">
+            <div style="color: #E0E0E0; font-size: 1rem; margin-top: 0.3rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">
                 {user_title}
             </div>
         </div>
