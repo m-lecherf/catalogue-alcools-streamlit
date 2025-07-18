@@ -14,6 +14,36 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Configuration avec chemins relatifs pour le déploiement
+ADMIN_EMAIL = "admin@vinpedia.com"
+ADMIN_PASSWORD = "admin123"
+ALLOWED_EMAILS = ["louis@vinpedia.com", ADMIN_EMAIL]
+
+# Chemins relatifs pour Streamlit Cloud
+DATA_DIR = "data"
+DATA_FILE = os.path.join(DATA_DIR, "recipes.json")
+IMAGES_DIR = os.path.join(DATA_DIR, "images")
+
+MAP_PASSWORD_EMAIL = { "louis@vinpedia.com": "user123", ADMIN_EMAIL: ADMIN_PASSWORD }
+
+# Création des dossiers si nécessaire - avec gestion d'erreurs
+def ensure_directories():
+    """Créer les dossiers nécessaires avec gestion d'erreurs"""
+    try:
+        os.makedirs(DATA_DIR, exist_ok=True)
+        os.makedirs(IMAGES_DIR, exist_ok=True)
+        
+        # Créer le fichier JSON s'il n'existe pas
+        if not os.path.exists(DATA_FILE):
+            with open(DATA_FILE, 'w', encoding='utf-8') as f:
+                json.dump([], f)
+                
+    except Exception as e:
+        st.error(f"Erreur lors de la création des dossiers: {e}")
+
+# Appeler la fonction de création des dossiers
+ensure_directories()
+
 # CSS moderne et simple
 def load_css():
     st.markdown("""
@@ -275,49 +305,45 @@ def load_css():
     </style>
     """, unsafe_allow_html=True)
 
-# Configuration
-ADMIN_EMAIL = "admin@vinpedia.com"
-ADMIN_PASSWORD = "admin123"
-ALLOWED_EMAILS = ["louis@vinpedia.com", ADMIN_EMAIL]
-DATA_FILE = "data/recipes.json"
-IMAGES_DIR = "data/images"
-MAP_PASSWORD_EMAIL = { "louis@vinpedia.com": "user123", ADMIN_EMAIL: ADMIN_PASSWORD }
-
-# Création des dossiers si nécessaire
-os.makedirs("data", exist_ok=True)
-os.makedirs(IMAGES_DIR, exist_ok=True)
-
-# Fonctions utilitaires
+# Fonctions utilitaires avec gestion d'erreurs améliorée
 def hash_password(password):
     """Hash un mot de passe"""
     return hashlib.sha256(password.encode()).hexdigest()
 
 def load_recipes():
-    """Charge les recettes depuis le fichier JSON"""
-    if os.path.exists(DATA_FILE):
-        try:
+    """Charge les recettes depuis le fichier JSON avec gestion d'erreurs"""
+    try:
+        if os.path.exists(DATA_FILE):
             with open(DATA_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except:
-            return []
-    return []
+                content = f.read().strip()
+                if content:
+                    return json.loads(content)
+        return []
+    except Exception as e:
+        st.error(f"Erreur lors du chargement des recettes: {e}")
+        return []
 
 def save_recipes(recipes):
-    """Sauvegarde les recettes dans le fichier JSON"""
+    """Sauvegarde les recettes dans le fichier JSON avec gestion d'erreurs"""
     try:
         with open(DATA_FILE, 'w', encoding='utf-8') as f:
             json.dump(recipes, f, ensure_ascii=False, indent=2)
+        return True
     except Exception as e:
         st.error(f"Erreur lors de la sauvegarde: {e}")
+        return False
 
 def save_image(uploaded_file):
-    """Sauvegarde une image uploadée"""
+    """Sauvegarde une image uploadée avec gestion d'erreurs"""
     if uploaded_file is not None:
         try:
             # Créer un nom unique pour l'image
             file_extension = uploaded_file.name.split('.')[-1]
             unique_filename = f"{uuid.uuid4()}.{file_extension}"
             file_path = os.path.join(IMAGES_DIR, unique_filename)
+            
+            # Vérifier que le dossier existe
+            os.makedirs(IMAGES_DIR, exist_ok=True)
             
             # Sauvegarder l'image
             with open(file_path, "wb") as f:
@@ -326,8 +352,8 @@ def save_image(uploaded_file):
             return unique_filename
         except Exception as e:
             st.error(f"Erreur lors de la sauvegarde de l'image: {e}")
-            return None
-    return None
+            return "default.jpg"
+    return "default.jpg"
 
 def is_admin(email):
     """Vérifie si l'utilisateur est admin"""
